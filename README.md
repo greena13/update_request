@@ -59,7 +59,11 @@ update_request.apply(admin_user)
 
 ```ruby
 class Customer < ActiveRecord::Base
-
   has_many :update_requests, as: :updateable, class_name: 'UpdateRequest::Request'
 end
+
+
+customer.update_requests
 ```
+
+
