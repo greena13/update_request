@@ -15,7 +15,9 @@ class UpdateRequest::Request < ActiveRecord::Base
   serialize :update_schema
 
   def apply!(approver = nil)
-    raise ActiveRecord::RecordInvalid(updateable, approver) unless apply
+    applied = apply(approver)
+    raise ActiveRecord::RecordInvalid.new(updateable) unless applied
+    applied
   end
 
   def apply(approver = nil)
