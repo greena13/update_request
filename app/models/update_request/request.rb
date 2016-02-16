@@ -137,18 +137,25 @@ class UpdateRequest::Request < ActiveRecord::Base
     if reference_chain.length > 0
       sub_schema = schema[next_step]
 
-      if sub_schema
-        sub_schema_with_payload =
-            insert_at_reference_chain_end(sub_schema, reference_chain, payload)
+      # Try using the stringified key if the integer fails (useful in the case
+      # of nested attributes arrays that use stringified integers as keys)
 
-        schema.dup.tap{|schema_clone| schema_clone[next_step] = sub_schema_with_payload }
-      else
+      unless sub_schema
+        next_step = next_step.to_s
+        sub_schema = schema[next_step]
+      end
+
+      unless sub_schema
         raise ArgumentError.new(
-            "File reference '#{reference_chain}' points to attribute not present in update schema '#{schema}'"
+            "File reference '#{next_step}' points to attribute not present in update schema '#{schema}'"
         )
 
       end
 
+      sub_schema_with_payload =
+          insert_at_reference_chain_end(sub_schema, reference_chain, payload)
+
+      schema.dup.tap{|schema_clone| schema_clone[next_step] = sub_schema_with_payload }
     else
       schema.dup.tap{|schema_clone| schema_clone[next_step] = payload }
     end
