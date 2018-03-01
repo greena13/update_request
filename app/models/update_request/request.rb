@@ -40,6 +40,7 @@ class UpdateRequest::Request < ActiveRecord::Base
   # Because the methods included in Paperclip::Attachment from the
   # Paperclip::Storage::Filesystem module are somehow lost in assigning the update
   # schema to the ActiveRecord::Base instance attribute, we need to re-include them
+
   def reinclude_modules_in_attachments(update_schema)
     update_schema.reduce({}) do |memo, key_and_value|
       key, value = key_and_value
@@ -78,27 +79,27 @@ class UpdateRequest::Request < ActiveRecord::Base
         updated_files.build(attachment: value, attribute_reference: stringify_reference(prefix, key))
       else
         memo[key] =
-            case value
+          case value
 
-              when Hash
-                extract_files_from(value, stringify_reference(prefix, key))
+            when Hash
+              extract_files_from(value, stringify_reference(prefix, key))
 
-              when Array
+            when Array
 
-                value.each_with_index.map do |value_item, index|
-                  reference = stringify_reference(stringify_reference(prefix, key), index)
+              value.each_with_index.map do |value_item, index|
+                reference = stringify_reference(stringify_reference(prefix, key), index)
 
-                  if value_item.kind_of?(Hash) || value_item.kind_of?(Array)
-                    extract_files_from(value_item, reference)
-                  else
-                    value_item
-                  end
-
+                if value_item.kind_of?(Hash) || value_item.kind_of?(Array)
+                  extract_files_from(value_item, reference)
+                else
+                  value_item
                 end
 
-              else
-                value
-            end
+              end
+
+            else
+              value
+          end
       end
 
       memo
