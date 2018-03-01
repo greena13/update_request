@@ -7,8 +7,6 @@ class UpdateRequest::Request < ActiveRecord::Base
 
   scope :outstanding, -> { where(applied: false) }
 
-  before_save :extract_files_from_schema
-
   after_save :reinsert_files_into_schema
   after_initialize :reinsert_files_into_schema
 
@@ -35,13 +33,21 @@ class UpdateRequest::Request < ActiveRecord::Base
     applied
   end
 
+  def assign_attributes(attributes)
+    if attributes[:update_schema]
+      super(attributes.merge(update_schema: extract_files_from(attributes[:update_schema])))
+    else
+      super(attributes)
+    end
+  end
+
   private
 
   # Because the methods included in Paperclip::Attachment from the
   # Paperclip::Storage::Filesystem module are somehow lost in assigning the update
   # schema to the ActiveRecord::Base instance attribute, we need to re-include them
 
-  def reinclude_modules_in_attachments(update_schema)
+  def reinclude_modules_in_attachments(update_schema = {})
     update_schema.reduce({}) do |memo, key_and_value|
       key, value = key_and_value
 
@@ -65,10 +71,6 @@ class UpdateRequest::Request < ActiveRecord::Base
       memo
     end
 
-  end
-
-  def extract_files_from_schema
-    self.update_schema = extract_files_from(update_schema)
   end
 
   def extract_files_from(schema, prefix = '')

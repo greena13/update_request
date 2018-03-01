@@ -1,4 +1,4 @@
-class CreateRequests < ActiveRecord::Migration
+class CreateRequests < ActiveRecord::Migration[4.2]
   def change
     create_table :update_request_requests do |t|
       t.belongs_to :updateable, polymorphic: true

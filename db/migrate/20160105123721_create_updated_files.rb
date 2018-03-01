@@ -1,4 +1,6 @@
-class CreateUpdatedFiles < ActiveRecord::Migration
+class CreateUpdatedFiles < ActiveRecord::Migration[4.2]
+  include Paperclip::Schema
+
   def change
     create_table :update_request_updated_files do |t|
       t.belongs_to :request
