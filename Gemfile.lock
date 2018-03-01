@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    update_request (0.0.6)
+    update_request (0.1.0)
       paperclip (>= 4.0.0)
       rails (>= 4.0.0)
 
